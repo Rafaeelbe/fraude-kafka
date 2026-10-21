@@ -20,7 +20,7 @@ public class ConsumidorTransacoes {
         Properties propriedades = new Properties();
         propriedades.put("bootstrap.servers", "localhost:9092");
         propriedades.put("group.id", "detector-fraudes");
-        propriedades.put("auto.offset.reset", "earliest");
+        propriedades.put("auto.offset.reset", "latest");
         propriedades.put("enable.auto.commit", "true");
         propriedades.put("key.deserializer",
                 "org.apache.kafka.common.serialization.StringDeserializer");
