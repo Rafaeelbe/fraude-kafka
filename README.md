@@ -11,6 +11,7 @@ Projeto acadêmico desenvolvido em Java para simular transações financeiras, p
 - PostgreSQL 16
 - Maven
 - Docker Compose
+- JUnit 5
 
 ## Regras de detecção
 
@@ -22,10 +23,12 @@ Projeto acadêmico desenvolvido em Java para simular transações financeiras, p
 
 - `src/main/java/br/com/fraudekafka/producer/`: gera transações simuladas e publica mensagens no Kafka.
 - `src/main/java/br/com/fraudekafka/consumer/`: consome mensagens e identifica possíveis fraudes.
-- `src/main/java/br/com/fraudekafka/database/`: conexão e persistência no PostgreSQL.
-- `src/main/java/br/com/fraudekafka/model/`: representação da transação.
-- `docker-compose.yml`: configuração dos serviços Kafka, ZooKeeper e PostgreSQL.
-- `schema.sql`: estrutura da tabela de transações.
+- `src/main/java/br/com/fraudekafka/database/`: gerencia a conexão e a persistência no PostgreSQL.
+- `src/main/java/br/com/fraudekafka/model/`: contém a representação da transação.
+- `src/test/java/br/com/fraudekafka/consumer/`: contém os testes automatizados do detector de fraudes.
+- `docker-compose.yml`: configura os serviços Kafka, ZooKeeper e PostgreSQL.
+- `schema.sql`: define a estrutura da tabela de transações.
+- `pom.xml`: configura as dependências e a compilação do projeto.
 
 ## Como executar
 
@@ -47,21 +50,35 @@ Get-Content .\schema.sql | docker compose exec -T postgres psql -U frauduser -d 
 
 ### 3. Compilar o projeto
 
-No IntelliJ IDEA, abra a janela Maven e execute `clean` e depois `compile`.
+No IntelliJ IDEA, abra a janela Maven e execute as tarefas `clean` e `compile`, nessa ordem.
 
-### 4. Executar o consumidor
+### 4. Executar os testes automatizados
 
-Execute a classe `br.com.fraudekafka.consumer.ConsumidorTransacoes`.
+Na janela Maven do IntelliJ IDEA, abra `Lifecycle` e execute a tarefa `test`.
 
-### 5. Executar o produtor
+Os testes verificam as três regras de detecção de fraude e um cenário de transação comum.
 
-Em outra execução do IntelliJ, execute a classe `br.com.fraudekafka.producer.ProdutorTransacoes`.
+### 5. Executar o consumidor
 
-O produtor envia uma transação aproximadamente a cada três segundos. O consumidor processa as mensagens, imprime alertas de fraude e salva os registros no PostgreSQL.
+No IntelliJ IDEA, execute a classe:
+
+`br.com.fraudekafka.consumer.ConsumidorTransacoes`
+
+O consumidor ficará aguardando as mensagens publicadas no tópico Kafka `transacoes`.
+
+### 6. Executar o produtor
+
+Em outra execução do IntelliJ IDEA, execute a classe:
+
+`br.com.fraudekafka.producer.ProdutorTransacoes`
+
+O produtor envia transações simuladas aproximadamente a cada três segundos.
+
+O consumidor processa as mensagens, imprime alertas quando identifica possíveis fraudes e salva as transações no PostgreSQL.
 
 ## Consultar os registros
 
-Execute no PowerShell:
+Para consultar as dez transações mais recentes, execute no PowerShell:
 
 ```powershell
 docker compose exec postgres psql -U frauduser -d fraudedb -c "SELECT * FROM transacoes ORDER BY data_hora DESC LIMIT 10;"
@@ -69,4 +86,4 @@ docker compose exec postgres psql -U frauduser -d fraudedb -c "SELECT * FROM tra
 
 ## Observação
 
-Este projeto utiliza dados simulados e regras simplificadas para fins acadêmicos. Os alertas representam suspeitas geradas pelas regras, não uma confirmação de fraude real.
+Este projeto utiliza dados simulados e regras simplificadas para fins acadêmicos. Os alertas representam suspeitas identificadas pelas regras implementadas, não uma confirmação de fraude real.
