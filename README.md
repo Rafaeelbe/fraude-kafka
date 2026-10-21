@@ -20,10 +20,10 @@ Projeto acadêmico desenvolvido em Java para simular transações financeiras, p
 
 ## Estrutura do projeto
 
-- `producer/`: gera transações simuladas e publica mensagens no Kafka.
-- `consumer/`: consome as mensagens e identifica possíveis fraudes.
-- `database/`: conexão e persistência no PostgreSQL.
-- `model/`: representação da transação.
+- `src/main/java/br/com/fraudekafka/producer/`: gera transações simuladas e publica mensagens no Kafka.
+- `src/main/java/br/com/fraudekafka/consumer/`: consome mensagens e identifica possíveis fraudes.
+- `src/main/java/br/com/fraudekafka/database/`: conexão e persistência no PostgreSQL.
+- `src/main/java/br/com/fraudekafka/model/`: representação da transação.
 - `docker-compose.yml`: configuração dos serviços Kafka, ZooKeeper e PostgreSQL.
 - `schema.sql`: estrutura da tabela de transações.
 
@@ -31,16 +31,18 @@ Projeto acadêmico desenvolvido em Java para simular transações financeiras, p
 
 ### 1. Iniciar os serviços
 
-Com Docker Desktop em execução, abra um terminal na raiz do projeto e execute:
+Com o Docker Desktop em execução, abra um terminal na raiz do projeto e execute:
 
-```bash
+```powershell
 docker compose up -d
 ```
 
 ### 2. Criar a tabela no PostgreSQL
 
-```bash
-docker compose exec -T postgres psql -U frauduser -d fraudedb -f /dev/stdin < schema.sql
+No PowerShell, execute:
+
+```powershell
+Get-Content .\schema.sql | docker compose exec -T postgres psql -U frauduser -d fraudedb
 ```
 
 ### 3. Compilar o projeto
@@ -53,13 +55,15 @@ Execute a classe `br.com.fraudekafka.consumer.ConsumidorTransacoes`.
 
 ### 5. Executar o produtor
 
-Em outra execução do IntelliJ, execute `br.com.fraudekafka.producer.ProdutorTransacoes`.
+Em outra execução do IntelliJ, execute a classe `br.com.fraudekafka.producer.ProdutorTransacoes`.
 
 O produtor envia uma transação aproximadamente a cada três segundos. O consumidor processa as mensagens, imprime alertas de fraude e salva os registros no PostgreSQL.
 
 ## Consultar os registros
 
-```bash
+Execute no PowerShell:
+
+```powershell
 docker compose exec postgres psql -U frauduser -d fraudedb -c "SELECT * FROM transacoes ORDER BY data_hora DESC LIMIT 10;"
 ```
 
